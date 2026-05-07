@@ -1,7 +1,7 @@
 # Run from project root:
 # python mqtt_services/mqtt_ai_service.py
 
-
+import logging
 import os
 import threading
 
@@ -13,6 +13,13 @@ from ai_tools.status_tool import get_latest_status
 from ai_tools.heatpump_mapping import get_heatpump_id
 
 load_dotenv("/home/sct/smartgate/config.env")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger(__name__)
 
 MQTT_HOST = os.getenv("MQTT_HOST", "server")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 1888))
@@ -32,22 +39,24 @@ def handle_message(client, topic, question):
     if heatpump_id is None:
         msg = f"Unknown SmartGate full number: {full_number}"
         client.publish(answer_topic, msg)
-        print(msg)
+        log.warning(msg)
         return
 
-    print(f"Question [{full_number}]: {question}")
+    log.info("Question [%s]: %s", full_number, question)
 
-    status = get_latest_status(heatpump_id)
-    answer = ask_ai(f"User question:\n{question}\n\nLatest heat pump status:\n{status}")
-
-    client.publish(answer_topic, answer)
-    print(f"Answer published to: {answer_topic}\n{answer}")
+    try:
+        status = get_latest_status(heatpump_id)
+        answer = ask_ai(f"User question:\n{question}\n\nLatest heat pump status:\n{status}")
+        client.publish(answer_topic, answer)
+        log.info("Answer published to %s", answer_topic)
+    except Exception:
+        log.exception("Failed to handle message for %s", full_number)
 
 
 def on_connect(client, userdata, flags, rc):
-    print("Connected to MQTT:", rc)
+    log.info("Connected to MQTT broker (rc=%s)", rc)
     client.subscribe(QUESTION_TOPIC)
-    print("Subscribed to:", QUESTION_TOPIC)
+    log.info("Subscribed to %s", QUESTION_TOPIC)
 
 
 def on_message(client, userdata, msg):
@@ -64,5 +73,5 @@ client.on_message = on_message
 
 client.connect(MQTT_HOST, MQTT_PORT, 60)
 
-print("SmartGate AI MQTT service started")
+log.info("SmartGate AI MQTT service started")
 client.loop_forever()

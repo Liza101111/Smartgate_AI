@@ -41,8 +41,6 @@ DB_PORT=
 DB_USER=
 DB_PASSWORD=
 DB_NAME=
-MQTT_HOST=
-MQTT_PORT=
 ```
 
 ## Running
