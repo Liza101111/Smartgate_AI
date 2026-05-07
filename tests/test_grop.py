@@ -1,19 +1,8 @@
-import os
-from dotenv import load_dotenv
-from groq import Groq
+# Run from project root:
+# PYTHONPATH=. python tests/test_grop.py
 
-load_dotenv("/home/sct/smartgate/config.env")
+from ai_tools.ai_client import ask_ai
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+answer = ask_ai("Explain SmartGate AI in one simple sentence.")
 
-response = client.chat.completions.create(
-    model="llama-3.3-70b-versatile",
-    messages=[
-        {
-            "role": "user",
-            "content": "Explain SmartGate AI agent in one simple sentence.",
-        }
-    ],
-)
-
-print(response.choices[0].message.content)
+print(answer)
