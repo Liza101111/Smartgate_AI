@@ -1,15 +1,16 @@
 import os
+from pathlib import Path
 from groq import Groq
 from dotenv import load_dotenv
 
-load_dotenv("/home/sct/smartgate/config.env")
+_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(_ROOT / "config.env")
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 MODEL = "llama-3.3-70b-versatile"
 
-with open("/home/sct/smartgate/prompts/system_prompt.txt") as f:
-    SYSTEM_PROMPT = f.read()
+SYSTEM_PROMPT = (_ROOT / "prompts" / "system_prompt.txt").read_text()
 
 
 def ask_ai(user_prompt):
