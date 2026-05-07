@@ -10,3 +10,6 @@ venv/
 
 # VS Code
 .vscode/
+
+# Editable install artifacts
+*.egg-info/
