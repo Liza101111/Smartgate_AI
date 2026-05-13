@@ -9,7 +9,9 @@ import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 
 from ai_tools.ai_client import ask_ai
+from ai_tools.alarm_tool import get_recent_alarms
 from ai_tools.status_tool import get_latest_status
+from ai_tools.log_tool import get_latest_log
 from ai_tools.heatpump_mapping import get_heatpump_id
 
 load_dotenv("/home/sct/smartgate/config.env")
@@ -46,7 +48,23 @@ def handle_message(client, topic, question):
 
     try:
         status = get_latest_status(heatpump_id)
-        answer = ask_ai(f"User question:\n{question}\n\nLatest heat pump status:\n{status}")
+        latest_log = get_latest_log(heatpump_id)
+        alarms = get_recent_alarms(heatpump_id)
+
+        answer = ask_ai(f"""
+        User question:
+        {question}
+
+        Latest heat pump status:
+        {status}
+
+        Latest heat pump log:
+        {latest_log}
+
+        Recent alarms:
+        {alarms}
+        """)
+
         client.publish(answer_topic, answer)
         log.info("Answer published to %s", answer_topic)
     except Exception:

@@ -1,5 +1,5 @@
 # Run from project root:
-# PYTHONPATH=. python tests/test_ai_status.py
+# python tests/test_ai_status.py
 
 from ai_tools.status_tool import get_latest_status
 from ai_tools.ai_client import ask_ai

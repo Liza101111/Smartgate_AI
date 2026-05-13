@@ -1,5 +1,5 @@
 # Run from project root:
-# PYTHONPATH=. python tests/test_db.py
+# python tests/test_db.py
 
 from ai_tools.db import get_connection
 
